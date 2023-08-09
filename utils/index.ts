@@ -1,11 +1,12 @@
-import { CarProps } from '@/types'
+import { CarProps, FilterProps } from '@/types'
 
-export async function fetchCars() {
+export async function fetchCars(filters: FilterProps) {
+  const { manufacturer, year, model, limit, fuel } = filters
   const headers = {
-    'X-RapidAPI-Key': '8c0dce0cc3msh165956b74a29152p123b70jsn315bf7f3ba95',
-    'X-RapidAPI-Host': 'cars-by-api-ninjas.p.rapidapi.com',
+    'X-RapidAPI-Key': process.env.API_KEY || '',
+    'X-RapidAPI-Host': process.env.API_HOST || '',
   }
-  const url = 'https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?model=carrera'
+  const url = `https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?make=${manufacturer}&year=${year}&model=${model}&limit=${limit}&fuel_type=${fuel}`
   const response = await fetch(url, { headers: headers })
   const result = await response.json()
   return result
@@ -24,6 +25,33 @@ export const calculateCarRent = (city_mpg: number, year: number) => {
   const rentalRatePerDay = basePricePerDay + mileageRate + ageRate
 
   return rentalRatePerDay.toFixed(0)
+}
+export const updateSearchParams = (type: string, value: string) => {
+  // Get the current URL search params
+  const searchParams = new URLSearchParams(window.location.search)
+
+  // Set the specified search parameter to the given value
+  searchParams.set(type, value)
+
+  // Set the specified search parameter to the given value
+  const newPathname = `${window.location.pathname}?${searchParams.toString()}`
+
+  return newPathname
+}
+
+export const deleteSearchParams = (type: string) => {
+  // Set the specified search parameter to the given value
+  const newSearchParams = new URLSearchParams(window.location.search)
+
+  // Delete the specified search parameter
+  newSearchParams.delete(type.toLocaleLowerCase())
+
+  // Construct the updated URL pathname with the deleted search parameter
+  const newPathname = `${
+    window.location.pathname
+  }?${newSearchParams.toString()}`
+
+  return newPathname
 }
 
 export const generateCarImageUrl = (car: CarProps, angle?: string) => {
